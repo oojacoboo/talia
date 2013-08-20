@@ -1,0 +1,25 @@
+{
+	"name": "talia/talia",
+	"description": "Talia is a PHP5.4+ Micro-Framework",
+	"keywords": ["microframework", "threeleafcreative", "talia"],
+	"minimum-stability": "dev",
+	"require": {
+		"php": ">=5.4"
+	},
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Three Leaf Creative",
+			"email": "info@threeleafcreative.com"
+		},
+		{
+			"name": "Josh Manders",
+			"email": "josh@joshmanders.com"
+		}
+	],
+	"autoload": {
+		"psr-0": {
+			"Talia": "src/"
+		}
+	}
+}
