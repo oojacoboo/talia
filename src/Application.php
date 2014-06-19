@@ -9,10 +9,10 @@ class Application extends Container
     /**
      * Construct application and register Talia Service Provider
      */
-    public function __construct($debug = false)
+    public function __construct()
     {
         parent::__construct();
-        $this->register(new TaliaServiceProvider($debug));
+        $this->register(new TaliaServiceProvider);
     }
 
     /**

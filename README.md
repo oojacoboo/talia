@@ -9,9 +9,7 @@ Example Usage:
 
 require 'vendor/autoload.php';
 
-use Killswitch\Talia\Application;
-
-$app = new Application();
+$app = new Killswitch\Talia\Application;
 
 $app->get('/', function() {
     echo 'Hello World.';
