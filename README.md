@@ -1,7 +1,7 @@
 Talia
 =====
 
-Talia is a PHP5.4+ Micro-Framework written by [Three Leaf Creative](http://www.threeleafcreative.com)
+Talia is a PHP5.4+ Micro-Framework
 
 Example Usage:
 ------
@@ -9,12 +9,12 @@ Example Usage:
 
 require 'vendor/autoload.php';
 
-use Talia\Talia AS App;
+use Killswitch\Talia\Application;
 
-$app = new App();
+$app = new Application();
 
 $app->get('/', function() {
-	echo 'Hello World.';
+    echo 'Hello World.';
 });
 
 $app->run();

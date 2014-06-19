@@ -1,25 +1,25 @@
 {
-	"name": "talia/talia",
-	"description": "Talia is a PHP5.4+ Micro-Framework",
-	"keywords": ["microframework", "threeleafcreative", "talia"],
-	"minimum-stability": "dev",
-	"require": {
-		"php": ">=5.4"
-	},
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "Three Leaf Creative",
-			"email": "info@threeleafcreative.com"
-		},
-		{
-			"name": "Josh Manders",
-			"email": "josh@joshmanders.com"
-		}
-	],
-	"autoload": {
-		"psr-0": {
-			"Talia": "src/"
-		}
-	}
+    "name": "killswitch/talia",
+    "description": "Talia is a PHP5.4+ Micro-Framework",
+    "keywords": ["microframework", "talia"],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4",
+        "illuminate/support": "~4.2",
+        "pimple/pimple": "~2.1",
+        "phroute/phroute": "~1.0",
+        "filp/whoops": "~1.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Josh Manders",
+            "email": "josh@joshmanders.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Killswitch\\Talia\\": "src/"
+        }
+    }
 }
