@@ -12,7 +12,7 @@ require 'vendor/autoload.php';
 $app = new Killswitch\Talia\Application;
 
 $app->get('/', function() {
-    echo 'Hello World.';
+    return 'Hello World.';
 });
 
 $app->run();
