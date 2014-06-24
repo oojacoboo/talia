@@ -9,7 +9,7 @@ class WhoopsServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $app)
     {
-        $app['whoops.error_page_handler'] = function()
+        $app['whoops.pretty_page'] = function()
         {
             return new PrettyPageHandler;
         };
@@ -20,6 +20,7 @@ class WhoopsServiceProvider implements ServiceProviderInterface
             $run->pushHandler($app['whoops.error_page_handler']);
             return $run;
         };
+        $app['whoops.pretty_page']->setPageTitle('Something broke!');
         $app['whoops']->register();
     }
 }
