@@ -1,7 +1,16 @@
-<?php namespace Killswitch\Talia\Providers;
+<?php namespace CertifiedWebNinja\Talia\Providers;
 
 use Pimple\Container;
 use Pimple\ServiceProviderInterface;
+use Phroute\RouteCollector;
+use Phroute\RouteParser;
+use Phroute\Dispatcher;
+use Whoops\Run;
+use Whoops\Handler\PrettyPageHandler;
+use Whoops\Handler\JsonResponseHandler;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class TaliaServiceProvider implements ServiceProviderInterface
 {
@@ -9,10 +18,10 @@ class TaliaServiceProvider implements ServiceProviderInterface
      * Some information about Talia
      */
     const NAME = 'Talia PHP Micro-Framework';
-    const VERSION = '2.0.0';
+    const VERSION = '2.0.1';
     const AUTHOR = 'Josh Manders';
     const AUTHOR_EMAIL = 'josh@joshmanders.com';
-    const AUTHOR_URL = 'http://www.joshmanders.com';
+    const AUTHOR_URL = 'http://www.certifiedwebninja.com';
 
     /**
      * Instance of Application Container
@@ -20,16 +29,6 @@ class TaliaServiceProvider implements ServiceProviderInterface
      * @var object
      */
     private $app;
-
-    /**
-     * Default providers to load
-     *
-     * @var array
-     */
-    private $providers = [
-        'WhoopsServiceProvider',
-        'RoutingServiceProvider'
-    ];
 
     /**
      * Register the service provider
@@ -40,8 +39,12 @@ class TaliaServiceProvider implements ServiceProviderInterface
     public function register(Container $app)
     {
         $this->app = $app;
-        $this->setupAboutDetails();
-        $this->registerDefaultProviders();
+        $this->registerTaliaAbout();
+        $this->registerRequest();
+        $this->registerResponse();
+        $this->registerSession();
+        $this->registerPhroute();
+        $this->registerWhoops();
     }
 
     /**
@@ -49,26 +52,97 @@ class TaliaServiceProvider implements ServiceProviderInterface
      *
      * @return void
      */
-    private function setupAboutDetails()
+    private function registerTaliaAbout()
     {
-        $this->app['app.name'] = self::NAME;
-        $this->app['app.version'] = self::VERSION;
-        $this->app['app.author'] = self::AUTHOR;
-        $this->app['app.author.email'] = self::AUTHOR_EMAIL;
-        $this->app['app.author.url'] = self::AUTHOR_URL;
+        $this->app['talia.name'] = self::NAME;
+        $this->app['talia.version'] = self::VERSION;
+        $this->app['talia.author'] = self::AUTHOR;
+        $this->app['talia.author.email'] = self::AUTHOR_EMAIL;
+        $this->app['talia.author.url'] = self::AUTHOR_URL;
     }
 
     /**
-     * Register all default providers
+     * Register request object
      *
      * @return void
      */
-    private function registerDefaultProviders()
+    private function registerRequest()
     {
-        foreach ($this->providers as $provider)
+        $this->app['request'] = function()
         {
-            $class = __NAMESPACE__.'\\'.$provider;
-            $this->app->register(new $class);
-        }
+            return Request::createFromGlobals();
+        };
+    }
+
+    /**
+     * Register response object
+     *
+     * @return void
+     */
+    private function registerResponse()
+    {
+        $this->app['response'] = function()
+        {
+            return new Response;
+        };
+    }
+
+    /**
+     * Register sessions
+     *
+     * @return void
+     */
+    private function registerSession()
+    {
+        $this->app['session'] = function()
+        {
+            $session = new Session();
+            $session->start();
+            return $session;
+        };
+    }
+
+    /**
+     * Register Phroute routing
+     *
+     * @return void
+     */
+    private function registerPhroute()
+    {
+        $this->app['routes'] = function()
+        {
+            return new RouteCollector(new RouteParser);
+        };
+        $this->app['dispatcher'] = function()
+        {
+            return new Dispatcher($this->app['routes']);
+        };
+    }
+
+    /**
+     * Register Whoops! error handling
+     *
+     * @return void
+     */
+    private function registerWhoops()
+    {
+        $this->app['whoops.pretty_page'] = function()
+        {
+            return new PrettyPageHandler;
+        };
+        $this->app['whoops.json_response'] = function()
+        {
+            return new JsonResponseHandler;
+        };
+        $this->app['whoops'] = function()
+        {
+            $run = new Run;
+            $run->allowQuit(false);
+            $run->pushHandler($this->app['whoops.json_response']);
+            $run->pushHandler($this->app['whoops.pretty_page']);
+            return $run;
+        };
+        $this->app['whoops.pretty_page']->setPageTitle('Something broke!');
+        if ($this->app['talia.environment'] != 'production') $this->app['whoops']->register();
     }
 }

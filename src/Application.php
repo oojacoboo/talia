@@ -1,18 +1,41 @@
-<?php namespace Killswitch\Talia;
+<?php namespace CertifiedWebNinja\Talia;
 
 use Exception;
 use Pimple\Container;
-use Killswitch\Talia\Providers\TaliaServiceProvider;
+use CertifiedWebNinja\Talia\Providers\TaliaServiceProvider;
+use Symfony\Component\HttpFoundation\Response;
 
 class Application extends Container
 {
     /**
      * Construct application and register Talia Service Provider
      */
-    public function __construct()
+    public function __construct($environment = 'production')
     {
         parent::__construct();
+        $this->setEnvironment($environment);
         $this->register(new TaliaServiceProvider);
+    }
+
+    /**
+     * Set the environment for the app
+     *
+     * @param mixed $environment Closure or string
+     */
+    public function setEnvironment($environment)
+    {
+        if (is_callable($environment)) $environment = $environment();
+        $this['talia.environment'] = $environment;
+    }
+
+    /**
+     * Return the application environment
+     *
+     * @return string environment
+     */
+    public function getEnvironment()
+    {
+        return $this['talia.environment'];
     }
 
     /**
@@ -56,12 +79,32 @@ class Application extends Container
     }
 
     /**
-     * Run the application and process routing
+     * Allow registering multiple providers via an array
      *
-     * @return mixed Contents of the route
+     * @param  mixed $providers Provider or array of providers
+     * @return void
+     */
+    public function registerProviders($providers)
+    {
+        if (is_array($providers))
+        {
+            foreach ($providers as $provider)
+            {
+                parent::register($provider);
+            }
+        }
+        else parent::register($providers);
+    }
+
+    /**
+     * Dispatch routing and send response
+     *
+     * @return Response
      */
     public function run()
     {
-        echo $this['dispatcher']->dispatch($this['request.method'], $this['request.uri']);
+        $response = $this['dispatcher']->dispatch($this['request']->getMethod(), $this['request']->getPathInfo());
+        if ($response instanceof Response) return $response->send();
+        else return $this['response']->create($response)->send();
     }
 }

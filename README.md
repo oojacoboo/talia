@@ -1,20 +1,28 @@
-Talia
-=====
+# Talia
 
-Talia is a PHP5.4+ Micro-Framework
+Talia is a PHP >= 5.4 Micro-framework built just to try new things, and build some stuff quickly via prototypes or even full blown apps.
 
-Example Usage:
-------
+## Installation
+
+Installation of Talia is pretty easy and straightforward. Create a `composer.json` file and just `require` Talia (`"certifiedwebninja/talia": "~2"`) then run `composer install`. After that it's pretty simple to get started below.
+
+## Example Usage:
+
 ```php
 
 require 'vendor/autoload.php';
 
-$app = new Killswitch\Talia\Application;
+use CertifiedWebNinja\Talia\Application;
 
-$app->get('/', function() {
-    return 'Hello World.';
+// Initialize application with environment
+$app = new Application('development');
+
+// GET / && return "Hell World!" response
+$app->get('/', function() use($app) {
+    return $app['response']->create('Hell World!');
 });
 
+// Run the app
 $app->run();
 
 /* END OF FILE */
