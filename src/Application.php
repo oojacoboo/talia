@@ -86,16 +86,13 @@ class Application extends Container
      * @param  mixed $providers Provider or array of providers
      * @return void
      */
-    public function registerProviders($providers)
-    {
-        if (is_array($providers))
-        {
+    public function registerProviders($providers) {
+        if(is_array($providers)) {
             foreach ($providers as $provider)
-            {
                 parent::register($provider);
-            }
+        } else {
+            parent::register($providers);
         }
-        else parent::register($providers);
     }
 
     /**
