@@ -9,7 +9,8 @@
         "pimple/pimple": "~2.1",
         "phroute/phroute": "~1.0",
         "filp/whoops": "~1.0",
-        "symfony/http-foundation": "~2.5"
+        "symfony/http-foundation": "~2.5",
+        "symfony/templating": "~2.5"
     },
     "license": "MIT",
     "authors": [

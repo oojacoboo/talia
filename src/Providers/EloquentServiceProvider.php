@@ -7,9 +7,15 @@ class EloquentServiceProvider implements ServiceProviderInterface
 {
     public function register(Container $app)
     {
-        $app['db'] = function()
+        $this->app = $app;
+        $this->registerEloquent();
+    }
+
+    private function registerEloquent()
+    {
+        $this->app['db'] = function()
         {
-            return 'Eloquent';
+            return null;
         };
     }
 }

@@ -2,19 +2,21 @@
 
 use Exception;
 use Pimple\Container;
-use CertifiedWebNinja\Talia\Providers\TaliaServiceProvider;
 use Symfony\Component\HttpFoundation\Response;
+use CertifiedWebNinja\Talia\Providers\TaliaServiceProvider;
 
 class Application extends Container
 {
     /**
      * Construct application and register Talia Service Provider
      */
-    public function __construct($environment = 'production')
+    public function __construct($environment = 'production', array $providers = array())
     {
         parent::__construct();
         $this->setEnvironment($environment);
-        $this->register(new TaliaServiceProvider);
+        $this->registerProviders(array_merge($providers, [
+            new TaliaServiceProvider
+        ]));
     }
 
     /**

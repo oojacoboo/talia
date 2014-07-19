@@ -10,7 +10,6 @@ use Whoops\Handler\PrettyPageHandler;
 use Whoops\Handler\JsonResponseHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 class TaliaServiceProvider implements ServiceProviderInterface
 {
@@ -41,8 +40,11 @@ class TaliaServiceProvider implements ServiceProviderInterface
         $this->app = $app;
         $this->registerTaliaAbout();
         $this->registerRequest();
+        $this->registerInput();
+        $this->registerServer();
+        $this->registerFiles();
+        $this->registerHeaders();
         $this->registerResponse();
-        $this->registerSession();
         $this->registerPhroute();
         $this->registerWhoops();
     }
@@ -74,6 +76,38 @@ class TaliaServiceProvider implements ServiceProviderInterface
         };
     }
 
+    private function registerInput()
+    {
+        $this->app['input'] = function()
+        {
+            return $this->app['request']->query;
+        };
+    }
+
+    private function registerServer()
+    {
+        $this->app['request.server'] = function()
+        {
+            return $this->app['request']->server;
+        };
+    }
+
+    private function registerFiles()
+    {
+        $this->app['input.files'] = function()
+        {
+            return $this->app['request']->files;
+        };
+    }
+
+    private function registerHeaders()
+    {
+        $this->app['request.headers'] = function()
+        {
+            return $this->app['request']->headers;
+        };
+    }
+
     /**
      * Register response object
      *
@@ -84,21 +118,6 @@ class TaliaServiceProvider implements ServiceProviderInterface
         $this->app['response'] = function()
         {
             return new Response;
-        };
-    }
-
-    /**
-     * Register sessions
-     *
-     * @return void
-     */
-    private function registerSession()
-    {
-        $this->app['session'] = function()
-        {
-            $session = new Session();
-            $session->start();
-            return $session;
         };
     }
 
@@ -128,19 +147,27 @@ class TaliaServiceProvider implements ServiceProviderInterface
     {
         $this->app['whoops.pretty_page'] = function()
         {
-            return new PrettyPageHandler;
+            $pretty = new PrettyPageHandler;
+            $pretty->setPageTitle('ERROR!!!');
+            $pretty->addDataTable($this->app['talia.name'], [
+                'Version' => $this->app['talia.version']
+            ]);
+            return $pretty;
         };
         $this->app['whoops.json_response'] = function()
         {
-            return new JsonResponseHandler;
+            $json = new JsonResponseHandler;
+            $json->addTraceToOutput(true);
+            $json->onlyForAjaxRequests(true);
+            return $json;
         };
         $this->app['whoops'] = function()
         {
-            $run = new Run;
-            $run->allowQuit(false);
-            $run->pushHandler($this->app['whoops.json_response']);
-            $run->pushHandler($this->app['whoops.pretty_page']);
-            return $run;
+            $whoops = new Run;
+            $whoops->allowQuit(true);
+            $whoops->pushHandler($this->app['whoops.json_response']);
+            $whoops->pushHandler($this->app['whoops.pretty_page']);
+            return $whoops;
         };
         $this->app['whoops.pretty_page']->setPageTitle('Something broke!');
         if ($this->app['talia.environment'] != 'production') $this->app['whoops']->register();
